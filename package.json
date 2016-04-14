@@ -1,0 +1,20 @@
+{
+  "name": "slot-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "./node_modules/bower/bin/bower install",
+    "start": "node index.js"
+  },
+  "author": "m0ngr31",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "bower": "^1.7.9",
+    "compression": "^1.6.1",
+    "express": "^4.13.4",
+    "lodash": "^4.11.0",
+    "restler": "^3.4.0"
+  }
+}

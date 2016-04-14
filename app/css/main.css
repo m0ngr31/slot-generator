@@ -1,0 +1,38 @@
+.url-before {
+  position: relative;
+}
+
+.url-before input {
+  padding-left:52px;
+}
+
+.url-before:before {
+  position: absolute;
+  top: -3;
+  content:"http://";
+  padding-left: 8px;
+}
+
+.error {
+  color: red;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.inline {
+  display: inline;
+}
+
+.hidden {
+  display: none;
+}
+
+.loading {
+  background: transparent url('../img/loading.gif') center center no-repeat;
+  border: none;
+}
+
+.text-area {
+  height: 300px;
+  overflow-y: auto;
+}
