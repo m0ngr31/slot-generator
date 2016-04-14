@@ -3,14 +3,14 @@
 }
 
 .url-before input {
-  padding-left:52px;
+  padding-left:54px;
 }
 
 .url-before:before {
   position: absolute;
-  top: -3;
   content:"http://";
   padding-left: 8px;
+  padding-top: 7px;
 }
 
 .error {
