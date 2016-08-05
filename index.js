@@ -28,12 +28,18 @@ app.post('/api/get-data', function (req, res) {
   var serverInfo = req.body;
   serverInfo.address = _.trimEnd(serverInfo.address, '/');
   var url = 'http://' + serverInfo.address + ':' + serverInfo.port + '/jsonrpc';
-  
+
   var mainOptions = {
     "jsonrpc":"2.0",
     "id":1
   };
-  
+
+  var musicPlaylistOptions = {
+    "jsonrpc":"2.0",
+    "id":1,
+    "params":{"directory": "special://musicplaylists"}
+  };
+
   var getTVShows = mainOptions;
   getTVShows.method = "VideoLibrary.GetTVShows";
   getTVShows = JSON.stringify(getTVShows);
@@ -43,12 +49,16 @@ app.post('/api/get-data', function (req, res) {
   var getMusicians = mainOptions;
   getMusicians.method = "AudioLibrary.GetArtists";
   getMusicians = JSON.stringify(getMusicians);
-  
+  var getMusicPlaylists = musicPlaylistOptions;
+  getMusicPlaylists.method = "Files.GetDirectory";
+  getMusicPlaylists = JSON.stringify(getMusicPlaylists);
+
   var tvShowsArr = [];
   var moviesArr = [];
   var musiciansArr = [];
+  var musicPlaylistsArr = [];
   var errorsArr = [];
-  
+
   var sanitizeResult = function(str) {
     str = removeDiacritics.remove(str);
     str = str.replace(/\([^)]*\)/, "");
@@ -112,10 +122,27 @@ app.post('/api/get-data', function (req, res) {
         console.log(err);
         errorsArr.push('Could not get Artists');
       }).on('complete', function() {
-        tvShowsArr = _.uniq(tvShowsArr);
-        moviesArr = _.uniq(moviesArr);
-        musiciansArr = _.uniq(musiciansArr);
-        res.send({'errors': errorsArr, 'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr});
+        restler.post(url, {
+          username: serverInfo.username,
+          password: serverInfo.password,
+          data: getMusicPlaylists
+        }).on('success', function(musicplaylists) {
+          if(musicplaylists.result && musicplaylists.result.files) {
+            _.forEach(musicplaylists.result.files, function(playlist) {
+              var str = sanitizeResult(playlist.label);
+              musicPlaylistsArr.push(str);
+            });
+          }
+        }).on('error', function(err) {
+          console.log(err);
+          errorsArr.push('Could not get Music Playlists');
+        }).on('complete', function() {
+          tvShowsArr = _.uniq(tvShowsArr);
+          moviesArr = _.uniq(moviesArr);
+          musiciansArr = _.uniq(musiciansArr);
+          musicPlaylistsArr = _.uniq(musicPlaylistsArr);
+          res.send({'errors': errorsArr, 'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr, 'musicplaylists': musicPlaylistsArr});
+        });
       });
     });
   });
