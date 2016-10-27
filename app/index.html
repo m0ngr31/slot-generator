@@ -6,7 +6,7 @@
     <title>Slot Generator</title>
     <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css" />
-    
+
     <link rel="stylesheet" href="/bower_components/skeleton/css/normalize.css" />
     <link rel="stylesheet" href="/bower_components/skeleton/css/skeleton.css" />
     <link rel="stylesheet" href="/css/custom-skeleton.css" />
@@ -48,30 +48,37 @@
         </div>
         <input class="button-primary" type="submit" id="submit-button" value="Submit" />
       </form>
-      <div class="row hidden" id="show-data">
-        <div class="three columns">
-          <label for="tvshow-data">SHOWS Slot</label>
-          <textarea class="u-full-width text-area" id="tvshow-data" disabled></textarea>
+      <div class="hidden" id="show-data">
+        <div class="row">
+          <div class="six columns">
+            <label for="tvshow-data">SHOWS Slot</label>
+            <textarea class="u-full-width text-area" id="tvshow-data" disabled></textarea>
+          </div>
+          <div class="six columns">
+            <label for="movie-data">MOVIES Slot</label>
+            <textarea class="u-full-width text-area" id="movie-data" disabled></textarea>
+          </div>
         </div>
-        <div class="three columns">
-          <label for="movie-data">MOVIES Slot</label>
-          <textarea class="u-full-width text-area" id="movie-data" disabled></textarea>
-        </div>
-        <div class="three columns">
-          <label for="musicartists-data">MUSICARTISTS Slot</label>
-          <textarea class="u-full-width text-area" id="musicartists-data" disabled></textarea>
-        </div>
-        <div class="three columns">
-          <label for="musicplaylists-data">MUSICPLAYLISTS Slot</label>
-          <textarea class="u-full-width text-area" id="musicplaylists-data" disabled></textarea>
+        <div class="row">
+          <div class="four columns">
+            <label for="musicartists-data">MUSICARTISTS Slot</label>
+            <textarea class="u-full-width text-area" id="musicartists-data" disabled></textarea>
+          </div>
+          <div class="four columns">
+            <label for="musicalbums-data">MUSICALBUMS Slot</label>
+            <textarea class="u-full-width text-area" id="musicalbums-data" disabled></textarea>
+          </div>
+          <div class="four columns">
+            <label for="musicplaylists-data">MUSICPLAYLISTS Slot</label>
+            <textarea class="u-full-width text-area" id="musicplaylists-data" disabled></textarea>
+          </div>
         </div>
       </div>
     </div>
-    
+
     <script src="/bower_components/jquery/dist/jquery.min.js"></script>
     <script src="/bower_components/lodash/dist/lodash.min.js"></script>
     <script src="/js/jquery.rest.min.js"></script>
     <script src="/js/app.js"></script>
   </body>
-  
 </html>
