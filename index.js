@@ -81,7 +81,6 @@ app.post('/api/get-data', function (req, res) {
         tvShowsArr.push(str);
       });
     }
-
     if(movies.data.result && movies.data.result.movies) {
       _.forEach(movies.data.result.movies, function(movie) {
         var str = sanitizeResult(movie.label);
