@@ -108,6 +108,15 @@ function submitForm() {
     });
     artistData.text(artistText);
 
+    var albumData = $('#musicalbums-data');
+    var albumText = '';
+    _.forEach(results.albums, function(album, index, array) {
+      albumText += album;
+      if(index !== array.length - 1)
+        albumText += '\n';
+    });
+    albumData.text(albumText);
+
     var musicplaylistsData = $('#musicplaylists-data');
     var musicplaylistsText = '';
     _.forEach(results.musicplaylists, function(playlist, index, array) {

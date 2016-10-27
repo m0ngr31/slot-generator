@@ -49,6 +49,9 @@ app.post('/api/get-data', function (req, res) {
   var getMusicians = mainOptions;
   getMusicians.method = "AudioLibrary.GetArtists";
   getMusicians = JSON.stringify(getMusicians);
+  var getAlbums = mainOptions;
+  getAlbums.method = "AudioLibrary.GetAlbums";
+  getAlbums = JSON.stringify(getAlbums);
   var getMusicPlaylists = musicPlaylistOptions;
   getMusicPlaylists.method = "Files.GetDirectory";
   getMusicPlaylists = JSON.stringify(getMusicPlaylists);
@@ -56,6 +59,7 @@ app.post('/api/get-data', function (req, res) {
   var tvShowsArr = [];
   var moviesArr = [];
   var musiciansArr = [];
+  var albumsArr = [];
   var musicPlaylistsArr = [];
   var errorsArr = [];
 
@@ -125,23 +129,40 @@ app.post('/api/get-data', function (req, res) {
         restler.post(url, {
           username: serverInfo.username,
           password: serverInfo.password,
-          data: getMusicPlaylists
-        }).on('success', function(musicplaylists) {
-          if(musicplaylists.result && musicplaylists.result.files) {
-            _.forEach(musicplaylists.result.files, function(playlist) {
-              var str = sanitizeResult(playlist.label);
-              musicPlaylistsArr.push(str);
+          data: getAlbums
+        }).on('success', function(albums) {
+          if(albums.result && albums.result.albums) {
+            _.forEach(albums.result.albums, function(album) {
+              var str = sanitizeResult(album.label);
+              albumsArr.push(str);
             });
           }
         }).on('error', function(err) {
           console.log(err);
-          errorsArr.push('Could not get Music Playlists');
+          errorsArr.push('Could not get Albums');
         }).on('complete', function() {
-          tvShowsArr = _.uniq(tvShowsArr);
-          moviesArr = _.uniq(moviesArr);
-          musiciansArr = _.uniq(musiciansArr);
-          musicPlaylistsArr = _.uniq(musicPlaylistsArr);
-          res.send({'errors': errorsArr, 'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr, 'musicplaylists': musicPlaylistsArr});
+          restler.post(url, {
+            username: serverInfo.username,
+            password: serverInfo.password,
+            data: getMusicPlaylists
+          }).on('success', function(musicplaylists) {
+            if(musicplaylists.result && musicplaylists.result.files) {
+              _.forEach(musicplaylists.result.files, function(playlist) {
+                var str = sanitizeResult(playlist.label);
+                musicPlaylistsArr.push(str);
+              });
+            }
+          }).on('error', function(err) {
+            console.log(err);
+            errorsArr.push('Could not get Music Playlists');
+          }).on('complete', function() {
+            tvShowsArr = _.uniq(tvShowsArr);
+            moviesArr = _.uniq(moviesArr);
+            musiciansArr = _.uniq(musiciansArr);
+            albumsArr = _.uniq(albumsArr);
+            musicPlaylistsArr = _.uniq(musicPlaylistsArr);
+            res.send({'errors': errorsArr, 'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr});
+          });
         });
       });
     });
