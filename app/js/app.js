@@ -53,37 +53,22 @@ function submitForm() {
   var username = $('#username').val();
   var password = $('#password').val();
 
-  var client = new $.RestClient('/api/');
-  client.add('api', { url: 'get-data' });
-
-  client.api.create({'username':username, 'password':password, 'address':url, 'port':port}).done(function(results) {
-    console.log(results);
-
-    var is404 = _.find(results.errors, function(error) {
-      return error === "404: Not found";
-    });
-
-    if(results.errors.length === 3 || is404) {
-      errorMsg.text('Please validate your information and try again');
-      errorRow.removeClass('hidden');
-      clearProgress();
-      return;
+  var promise = axios({
+    method: 'post',
+    url: '/api/get-data',
+    timeout: 5000,
+    data: {
+      username: username,
+      password: password,
+      address: url,
+      port: port
     }
+  });
 
-    var notAuthed = _.find(results.errors, function(error) {
-      return error === "401: Not Authorized";
-    });
-
-    if(notAuthed) {
-      errorMsg.text('Please validate your username and password');
-      errorRow.removeClass('hidden');
-      clearProgress();
-      return;
-    }
-
+  promise.then(function(results) {
     var tvData = $('#tvshow-data');
     var tvText = '';
-    _.forEach(results.tvshows, function(tvshow, index, array) {
+    _.forEach(results.data.tvshows, function(tvshow, index, array) {
       tvText += tvshow;
       if(index !== array.length - 1)
         tvText += '\n';
@@ -92,7 +77,7 @@ function submitForm() {
 
     var movieData = $('#movie-data');
     var movieText = '';
-    _.forEach(results.movies, function(movie, index, array) {
+    _.forEach(results.data.movies, function(movie, index, array) {
       movieText += movie;
       if(index !== array.length - 1)
         movieText += '\n';
@@ -101,7 +86,7 @@ function submitForm() {
 
     var artistData = $('#musicartists-data');
     var artistText = '';
-    _.forEach(results.musicians, function(artist, index, array) {
+    _.forEach(results.data.musicians, function(artist, index, array) {
       artistText += artist;
       if(index !== array.length - 1)
         artistText += '\n';
@@ -110,7 +95,7 @@ function submitForm() {
 
     var albumData = $('#musicalbums-data');
     var albumText = '';
-    _.forEach(results.albums, function(album, index, array) {
+    _.forEach(results.data.albums, function(album, index, array) {
       albumText += album;
       if(index !== array.length - 1)
         albumText += '\n';
@@ -119,7 +104,7 @@ function submitForm() {
 
     var musicplaylistsData = $('#musicplaylists-data');
     var musicplaylistsText = '';
-    _.forEach(results.musicplaylists, function(playlist, index, array) {
+    _.forEach(results.data.musicplaylists, function(playlist, index, array) {
       musicplaylistsText += playlist;
       if(index !== array.length - 1)
         musicplaylistsText += '\n';
@@ -127,7 +112,11 @@ function submitForm() {
     musicplaylistsData.text(musicplaylistsText);
 
     dataRow.removeClass('hidden');
-
+    clearProgress();
+  }).catch(function(err) {
+    console.log(err);
+    errorMsg.text('Please validate your server information and try again');
+    errorRow.removeClass('hidden');
     clearProgress();
   });
 }
