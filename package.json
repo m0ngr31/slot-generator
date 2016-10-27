@@ -10,11 +10,11 @@
   "author": "m0ngr31",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.15.2",
     "body-parser": "^1.15.0",
     "bower": "^1.7.9",
     "compression": "^1.6.1",
     "express": "^4.13.4",
-    "lodash": "^4.11.0",
-    "restler": "^3.4.0"
+    "lodash": "^4.11.0"
   }
 }

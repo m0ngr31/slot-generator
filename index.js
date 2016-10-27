@@ -1,7 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var compress = require('compression');
-var restler = require('restler');
+var axios = require('axios');
 var _ = require('lodash');
 var removeDiacritics = require('./removeDiacritics');
 
@@ -34,34 +34,25 @@ app.post('/api/get-data', function (req, res) {
     "id":1
   };
 
-  var musicPlaylistOptions = {
-    "jsonrpc":"2.0",
-    "id":1,
-    "params":{"directory": "special://musicplaylists"}
-  };
+  var musicPlaylistOptions = _.clone(mainOptions);
+  musicPlaylistOptions.params = {"directory": "special://musicplaylists"};
 
-  var getTVShows = mainOptions;
+  var getTVShows = _.clone(mainOptions);
   getTVShows.method = "VideoLibrary.GetTVShows";
-  getTVShows = JSON.stringify(getTVShows);
-  var getMovies = mainOptions;
+  var getMovies = _.clone(mainOptions);
   getMovies.method = "VideoLibrary.GetMovies";
-  getMovies = JSON.stringify(getMovies);
-  var getMusicians = mainOptions;
+  var getMusicians = _.clone(mainOptions);
   getMusicians.method = "AudioLibrary.GetArtists";
-  getMusicians = JSON.stringify(getMusicians);
-  var getAlbums = mainOptions;
+  var getAlbums = _.clone(mainOptions);
   getAlbums.method = "AudioLibrary.GetAlbums";
-  getAlbums = JSON.stringify(getAlbums);
-  var getMusicPlaylists = musicPlaylistOptions;
+  var getMusicPlaylists = _.clone(musicPlaylistOptions);
   getMusicPlaylists.method = "Files.GetDirectory";
-  getMusicPlaylists = JSON.stringify(getMusicPlaylists);
 
   var tvShowsArr = [];
   var moviesArr = [];
   var musiciansArr = [];
   var albumsArr = [];
   var musicPlaylistsArr = [];
-  var errorsArr = [];
 
   var sanitizeResult = function(str) {
     str = removeDiacritics.remove(str);
@@ -74,98 +65,63 @@ app.post('/api/get-data', function (req, res) {
     str = _.trimEnd(str);
     return str;
   };
-  
-  restler.post(url, {
-    username: serverInfo.username,
-    password: serverInfo.password,
-    data: getTVShows
-  }).on('success', function(shows) {
-    if(shows.result && shows.result.tvshows) {
-      _.forEach(shows.result.tvshows, function(tvshow) {
+
+  var promisesArr = [
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShows, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovies, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 3000 })
+  ];
+
+  axios.all(promisesArr).then(axios.spread(function (shows, movies, musicians, albums, musicplaylists) {
+    if(shows.data.result && shows.data.result.tvshows) {
+      _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
         tvShowsArr.push(str);
       });
     }
-  }).on('401', function(data, err) {
-    console.log(err);
-    errorsArr.push('401: Not Authorized');
-  }).on('error', function(err) {
-    console.log(err);
-    if(err.code === "ENOTFOUND")
-      errorsArr.push('404: Not found');
-    else
-      errorsArr.push('Could not get TV Shows');
-  }).on('complete', function() {
-    restler.post(url, {
-      username: serverInfo.username,
-      password: serverInfo.password,
-      data: getMovies
-    }).on('success', function(movies) {
-      if(movies.result && movies.result.movies) {
-        _.forEach(movies.result.movies, function(movie) {
-          var str = sanitizeResult(movie.label);
-          moviesArr.push(str);
-        });
-      }
-    }).on('error', function(err) {
-      console.log(err);
-      errorsArr.push('Could not get Movies');
-    }).on('complete', function() {
-      restler.post(url, {
-        username: serverInfo.username,
-        password: serverInfo.password,
-        data: getMusicians
-      }).on('success', function(musicians) {
-        if(musicians.result && musicians.result.artists) {
-          _.forEach(musicians.result.artists, function(artist) {
-            var str = sanitizeResult(artist.label);
-            musiciansArr.push(str);
-          });
-        }
-      }).on('error', function(err) {
-        console.log(err);
-        errorsArr.push('Could not get Artists');
-      }).on('complete', function() {
-        restler.post(url, {
-          username: serverInfo.username,
-          password: serverInfo.password,
-          data: getAlbums
-        }).on('success', function(albums) {
-          if(albums.result && albums.result.albums) {
-            _.forEach(albums.result.albums, function(album) {
-              var str = sanitizeResult(album.label);
-              albumsArr.push(str);
-            });
-          }
-        }).on('error', function(err) {
-          console.log(err);
-          errorsArr.push('Could not get Albums');
-        }).on('complete', function() {
-          restler.post(url, {
-            username: serverInfo.username,
-            password: serverInfo.password,
-            data: getMusicPlaylists
-          }).on('success', function(musicplaylists) {
-            if(musicplaylists.result && musicplaylists.result.files) {
-              _.forEach(musicplaylists.result.files, function(playlist) {
-                var str = sanitizeResult(playlist.label);
-                musicPlaylistsArr.push(str);
-              });
-            }
-          }).on('error', function(err) {
-            console.log(err);
-            errorsArr.push('Could not get Music Playlists');
-          }).on('complete', function() {
-            tvShowsArr = _.uniq(tvShowsArr);
-            moviesArr = _.uniq(moviesArr);
-            musiciansArr = _.uniq(musiciansArr);
-            albumsArr = _.uniq(albumsArr);
-            musicPlaylistsArr = _.uniq(musicPlaylistsArr);
-            res.send({'errors': errorsArr, 'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr});
-          });
-        });
+
+    if(movies.data.result && movies.data.result.movies) {
+      _.forEach(movies.data.result.movies, function(movie) {
+        var str = sanitizeResult(movie.label);
+        moviesArr.push(str);
       });
-    });
+    }
+    if(musicians.data.result && musicians.data.result.artists) {
+      _.forEach(musicians.data.result.artists, function(artist) {
+        var str = sanitizeResult(artist.label);
+        musiciansArr.push(str);
+      });
+    }
+    if(albums.data.result && albums.data.result.albums) {
+      _.forEach(albums.data.result.albums, function(album) {
+        var str = sanitizeResult(album.label);
+        albumsArr.push(str);
+      });
+    }
+    if(musicplaylists.data.result && musicplaylists.data.result.files) {
+      _.forEach(musicplaylists.data.result.files, function(playlist) {
+        var str = sanitizeResult(playlist.label);
+        musicPlaylistsArr.push(str);
+      });
+    }
+
+    tvShowsArr = _.compact(_.uniq(tvShowsArr));
+    moviesArr = _.compact(_.uniq(moviesArr));
+    musiciansArr = _.compact(_.uniq(musiciansArr));
+    albumsArr = _.compact(_.uniq(albumsArr));
+    musicPlaylistsArr = _.compact(_.uniq(musicPlaylistsArr));
+    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr});
+  })).catch(function(err) {
+    console.log(err);
+    
+    if(err.response.status === 401)
+      res.status(401).send('401: Not Authorized');
+    else if(err.response.status === 404)
+      res.status(404).send('404: Not found');
+    else
+      res.status(500).send('Could not complete request');
   });
 });
 
