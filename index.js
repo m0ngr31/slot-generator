@@ -41,6 +41,9 @@ app.post('/api/get-data', function (req, res) {
   getTVShows.method = "VideoLibrary.GetTVShows";
   var getMovies = _.clone(mainOptions);
   getMovies.method = "VideoLibrary.GetMovies";
+  var getMovieGenres = _.clone(mainOptions);
+  getMovieGenres.method = "VideoLibrary.GetGenres";
+  getMovieGenres.params = {"type":"movie"};
   var getMusicians = _.clone(mainOptions);
   getMusicians.method = "AudioLibrary.GetArtists";
   var getAlbums = _.clone(mainOptions);
@@ -50,6 +53,7 @@ app.post('/api/get-data', function (req, res) {
 
   var tvShowsArr = [];
   var moviesArr = [];
+  var movieGenresArr = [];
   var musiciansArr = [];
   var albumsArr = [];
   var musicPlaylistsArr = [];
@@ -69,12 +73,13 @@ app.post('/api/get-data', function (req, res) {
   var promisesArr = [
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShows, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovies, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovieGenres, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 3000 })
   ];
 
-  axios.all(promisesArr).then(axios.spread(function (shows, movies, musicians, albums, musicplaylists) {
+  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, musicplaylists) {
     if(shows.data.result && shows.data.result.tvshows) {
       _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
@@ -85,6 +90,12 @@ app.post('/api/get-data', function (req, res) {
       _.forEach(movies.data.result.movies, function(movie) {
         var str = sanitizeResult(movie.label);
         moviesArr.push(str);
+      });
+    }
+    if(moviegenres.data.result && moviegenres.data.result.genres) {
+      _.forEach(moviegenres.data.result.genres, function(genre) {
+        var str = sanitizeResult(genre.label);
+        movieGenresArr.push(str);
       });
     }
     if(musicians.data.result && musicians.data.result.artists) {
@@ -108,10 +119,11 @@ app.post('/api/get-data', function (req, res) {
 
     tvShowsArr = _.compact(_.uniq(tvShowsArr));
     moviesArr = _.compact(_.uniq(moviesArr));
+    movieGenresArr = _.compact(_.uniq(movieGenresArr));
     musiciansArr = _.compact(_.uniq(musiciansArr));
     albumsArr = _.compact(_.uniq(albumsArr));
     musicPlaylistsArr = _.compact(_.uniq(musicPlaylistsArr));
-    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr});
+    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr});
   })).catch(function(err) {
     console.log(err);
     
