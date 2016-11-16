@@ -84,6 +84,15 @@ function submitForm() {
     });
     movieData.text(movieText);
 
+    var movieGenreData = $('#moviegenre-data');
+    var movieGenreText = '';
+    _.forEach(results.data.moviegenres, function(moviegenre, index, array) {
+      movieGenreText += moviegenre;
+      if(index !== array.length - 1)
+        movieGenreText += '\n';
+    });
+    movieGenreData.text(movieGenreText);
+
     var artistData = $('#musicartists-data');
     var artistText = '';
     _.forEach(results.data.musicians, function(artist, index, array) {
