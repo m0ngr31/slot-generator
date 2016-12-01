@@ -37,6 +37,15 @@ app.post('/api/get-data', function (req, res) {
   var musicPlaylistOptions = _.clone(mainOptions);
   musicPlaylistOptions.params = {"directory": "special://musicplaylists"};
 
+  var addonsVideoOptions = _.clone(mainOptions);
+  addonsVideoOptions.params = {"content": "video", "properties":["name"]};
+  var addonsAudioOptions = _.clone(mainOptions);
+  addonsAudioOptions.params = {"content": "audio", "properties":["name"]};
+  var addonsImageOptions = _.clone(mainOptions);
+  addonsImageOptions.params = {"content": "image", "properties":["name"]};
+  var addonsExeOptions = _.clone(mainOptions);
+  addonsExeOptions.params = {"content": "executable", "properties":["name"]};
+
   var getTVShows = _.clone(mainOptions);
   getTVShows.method = "VideoLibrary.GetTVShows";
   var getMovies = _.clone(mainOptions);
@@ -50,6 +59,14 @@ app.post('/api/get-data', function (req, res) {
   getAlbums.method = "AudioLibrary.GetAlbums";
   var getMusicPlaylists = _.clone(musicPlaylistOptions);
   getMusicPlaylists.method = "Files.GetDirectory";
+  var getAddonsVideo = _.clone(addonsVideoOptions);
+  getAddonsVideo.method = "Addons.GetAddons";
+  var getAddonsAudio = _.clone(addonsAudioOptions);
+  getAddonsAudio.method = "Addons.GetAddons";
+  var getAddonsImage = _.clone(addonsImageOptions);
+  getAddonsImage.method = "Addons.GetAddons";
+  var getAddonsExe = _.clone(addonsExeOptions);
+  getAddonsExe.method = "Addons.GetAddons";
 
   var tvShowsArr = [];
   var moviesArr = [];
@@ -57,6 +74,7 @@ app.post('/api/get-data', function (req, res) {
   var musiciansArr = [];
   var albumsArr = [];
   var musicPlaylistsArr = [];
+  var addonsArr = [];
 
   var sanitizeResult = function(str) {
     str = removeDiacritics.remove(str);
@@ -76,10 +94,14 @@ app.post('/api/get-data', function (req, res) {
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovieGenres, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 3000 }),
-    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 3000 })
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsVideo, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsAudio, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsImage, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsExe, timeout: 3000 })
   ];
 
-  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, musicplaylists) {
+  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, musicplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
     if(shows.data.result && shows.data.result.tvshows) {
       _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
@@ -116,6 +138,30 @@ app.post('/api/get-data', function (req, res) {
         musicPlaylistsArr.push(str);
       });
     }
+    if(addonsvideo.data.result && addonsvideo.data.result.addons) {
+      _.forEach(addonsvideo.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
+    if(addonsaudio.data.result && addonsaudio.data.result.addons) {
+      _.forEach(addonsaudio.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
+    if(addonsimage.data.result && addonsimage.data.result.addons) {
+      _.forEach(addonsimage.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
+    if(addonsexe.data.result && addonsexe.data.result.addons) {
+      _.forEach(addonsexe.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
 
     tvShowsArr = _.compact(_.uniq(tvShowsArr));
     moviesArr = _.compact(_.uniq(moviesArr));
@@ -123,10 +169,11 @@ app.post('/api/get-data', function (req, res) {
     musiciansArr = _.compact(_.uniq(musiciansArr));
     albumsArr = _.compact(_.uniq(albumsArr));
     musicPlaylistsArr = _.compact(_.uniq(musicPlaylistsArr));
-    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr});
+    addonsArr = _.compact(_.uniq(addonsArr));
+    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr, 'addons': addonsArr});
   })).catch(function(err) {
     console.log(err);
-    
+
     if(err.response.status === 401)
       res.status(401).send('401: Not Authorized');
     else if(err.response.status === 404)

@@ -120,6 +120,15 @@ function submitForm() {
     });
     musicplaylistsData.text(musicplaylistsText);
 
+    var addonsData = $('#addons-data');
+    var addonsText = '';
+    _.forEach(results.data.addons, function(addon, index, array) {
+      addonsText += addon;
+      if(index !== array.length - 1)
+        addonsText += '\n';
+    });
+    addonsData.text(addonsText);
+
     dataRow.removeClass('hidden');
     clearProgress();
   }).catch(function(err) {
