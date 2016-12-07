@@ -111,6 +111,15 @@ function submitForm() {
     });
     albumData.text(albumText);
 
+    var songData = $('#musicsongs-data');
+    var songText = '';
+    _.forEach(results.data.songs, function(song, index, array) {
+      songText += song;
+      if(index !== array.length - 1)
+        songText += '\n';
+    });
+    songData.text(songText);
+
     var musicplaylistsData = $('#musicplaylists-data');
     var musicplaylistsText = '';
     _.forEach(results.data.musicplaylists, function(playlist, index, array) {

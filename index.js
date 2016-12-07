@@ -57,6 +57,8 @@ app.post('/api/get-data', function (req, res) {
   getMusicians.method = "AudioLibrary.GetArtists";
   var getAlbums = _.clone(mainOptions);
   getAlbums.method = "AudioLibrary.GetAlbums";
+  var getSongs = _.clone(mainOptions);
+  getSongs.method = "AudioLibrary.GetSongs";
   var getMusicPlaylists = _.clone(musicPlaylistOptions);
   getMusicPlaylists.method = "Files.GetDirectory";
   var getAddonsVideo = _.clone(addonsVideoOptions);
@@ -73,6 +75,7 @@ app.post('/api/get-data', function (req, res) {
   var movieGenresArr = [];
   var musiciansArr = [];
   var albumsArr = [];
+  var songsArr = [];
   var musicPlaylistsArr = [];
   var addonsArr = [];
 
@@ -94,6 +97,7 @@ app.post('/api/get-data', function (req, res) {
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovieGenres, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 3000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getSongs, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsVideo, timeout: 3000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsAudio, timeout: 3000 }),
@@ -101,7 +105,7 @@ app.post('/api/get-data', function (req, res) {
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsExe, timeout: 3000 })
   ];
 
-  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, musicplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
+  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, songs, musicplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
     if(shows.data.result && shows.data.result.tvshows) {
       _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
@@ -130,6 +134,12 @@ app.post('/api/get-data', function (req, res) {
       _.forEach(albums.data.result.albums, function(album) {
         var str = sanitizeResult(album.label);
         albumsArr.push(str);
+      });
+    }
+    if(songs.data.result && songs.data.result.songs) {
+      _.forEach(songs.data.result.songs, function(song) {
+        var str = sanitizeResult(song.label);
+        songsArr.push(str);
       });
     }
     if(musicplaylists.data.result && musicplaylists.data.result.files) {
@@ -168,9 +178,10 @@ app.post('/api/get-data', function (req, res) {
     movieGenresArr = _.compact(_.uniq(movieGenresArr));
     musiciansArr = _.compact(_.uniq(musiciansArr));
     albumsArr = _.compact(_.uniq(albumsArr));
+    songsArr = _.compact(_.uniq(songsArr));
     musicPlaylistsArr = _.compact(_.uniq(musicPlaylistsArr));
     addonsArr = _.compact(_.uniq(addonsArr));
-    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr, 'addons': addonsArr});
+    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'songs': songsArr, 'musicplaylists': musicPlaylistsArr, 'addons': addonsArr});
   })).catch(function(err) {
     console.log(err);
 
