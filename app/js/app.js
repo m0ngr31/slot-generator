@@ -129,6 +129,15 @@ function submitForm() {
     });
     musicplaylistsData.text(musicplaylistsText);
 
+    var videoplaylistsData = $('#videoplaylists-data');
+    var videoplaylistsText = '';
+    _.forEach(results.data.videoplaylists, function(playlist, index, array) {
+      videoplaylistsText += playlist;
+      if(index !== array.length - 1)
+        videoplaylistsText += '\n';
+    });
+    videoplaylistsData.text(videoplaylistsText);
+
     var addonsData = $('#addons-data');
     var addonsText = '';
     _.forEach(results.data.addons, function(addon, index, array) {
