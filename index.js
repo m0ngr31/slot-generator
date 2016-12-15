@@ -36,23 +36,53 @@ app.post('/api/get-data', function (req, res) {
 
   var musicPlaylistOptions = _.clone(mainOptions);
   musicPlaylistOptions.params = {"directory": "special://musicplaylists"};
+  var videoPlaylistOptions = _.clone(mainOptions);
+  videoPlaylistOptions.params = {"directory": "special://videoplaylists"};
+
+  var addonsVideoOptions = _.clone(mainOptions);
+  addonsVideoOptions.params = {"content": "video", "properties":["name"]};
+  var addonsAudioOptions = _.clone(mainOptions);
+  addonsAudioOptions.params = {"content": "audio", "properties":["name"]};
+  var addonsImageOptions = _.clone(mainOptions);
+  addonsImageOptions.params = {"content": "image", "properties":["name"]};
+  var addonsExeOptions = _.clone(mainOptions);
+  addonsExeOptions.params = {"content": "executable", "properties":["name"]};
 
   var getTVShows = _.clone(mainOptions);
   getTVShows.method = "VideoLibrary.GetTVShows";
   var getMovies = _.clone(mainOptions);
   getMovies.method = "VideoLibrary.GetMovies";
+  var getMovieGenres = _.clone(mainOptions);
+  getMovieGenres.method = "VideoLibrary.GetGenres";
+  getMovieGenres.params = {"type":"movie"};
   var getMusicians = _.clone(mainOptions);
   getMusicians.method = "AudioLibrary.GetArtists";
   var getAlbums = _.clone(mainOptions);
   getAlbums.method = "AudioLibrary.GetAlbums";
+  var getSongs = _.clone(mainOptions);
+  getSongs.method = "AudioLibrary.GetSongs";
   var getMusicPlaylists = _.clone(musicPlaylistOptions);
   getMusicPlaylists.method = "Files.GetDirectory";
+  var getVideoPlaylists = _.clone(videoPlaylistOptions);
+  getVideoPlaylists.method = "Files.GetDirectory";
+  var getAddonsVideo = _.clone(addonsVideoOptions);
+  getAddonsVideo.method = "Addons.GetAddons";
+  var getAddonsAudio = _.clone(addonsAudioOptions);
+  getAddonsAudio.method = "Addons.GetAddons";
+  var getAddonsImage = _.clone(addonsImageOptions);
+  getAddonsImage.method = "Addons.GetAddons";
+  var getAddonsExe = _.clone(addonsExeOptions);
+  getAddonsExe.method = "Addons.GetAddons";
 
   var tvShowsArr = [];
   var moviesArr = [];
+  var movieGenresArr = [];
   var musiciansArr = [];
   var albumsArr = [];
+  var songsArr = [];
   var musicPlaylistsArr = [];
+  var videoPlaylistsArr = [];
+  var addonsArr = [];
 
   var sanitizeResult = function(str) {
     str = removeDiacritics.remove(str);
@@ -67,14 +97,22 @@ app.post('/api/get-data', function (req, res) {
   };
 
   var promisesArr = [
+
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShows, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovies, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovieGenres, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 10000 }),
-    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 10000 })
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getSongs, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getVideoPlaylists, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsVideo, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsAudio, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsImage, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsExe, timeout: 10000 })
   ];
 
-  axios.all(promisesArr).then(axios.spread(function (shows, movies, musicians, albums, musicplaylists) {
+  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, songs, musicplaylists, videoplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
     if(shows.data.result && shows.data.result.tvshows) {
       _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
@@ -85,6 +123,12 @@ app.post('/api/get-data', function (req, res) {
       _.forEach(movies.data.result.movies, function(movie) {
         var str = sanitizeResult(movie.label);
         moviesArr.push(str);
+      });
+    }
+    if(moviegenres.data.result && moviegenres.data.result.genres) {
+      _.forEach(moviegenres.data.result.genres, function(genre) {
+        var str = sanitizeResult(genre.label);
+        movieGenresArr.push(str);
       });
     }
     if(musicians.data.result && musicians.data.result.artists) {
@@ -99,22 +143,62 @@ app.post('/api/get-data', function (req, res) {
         albumsArr.push(str);
       });
     }
+    if(songs.data.result && songs.data.result.songs) {
+      _.forEach(songs.data.result.songs, function(song) {
+        var str = sanitizeResult(song.label);
+        songsArr.push(str);
+      });
+    }
     if(musicplaylists.data.result && musicplaylists.data.result.files) {
       _.forEach(musicplaylists.data.result.files, function(playlist) {
         var str = sanitizeResult(playlist.label);
         musicPlaylistsArr.push(str);
       });
     }
+    if(videoplaylists.data.result && videoplaylists.data.result.files) {
+      _.forEach(videoplaylists.data.result.files, function(playlist) {
+        var str = sanitizeResult(playlist.label);
+        videoPlaylistsArr.push(str);
+      });
+    }
+    if(addonsvideo.data.result && addonsvideo.data.result.addons) {
+      _.forEach(addonsvideo.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
+    if(addonsaudio.data.result && addonsaudio.data.result.addons) {
+      _.forEach(addonsaudio.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
+    if(addonsimage.data.result && addonsimage.data.result.addons) {
+      _.forEach(addonsimage.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
+    if(addonsexe.data.result && addonsexe.data.result.addons) {
+      _.forEach(addonsexe.data.result.addons, function(addon) {
+        var str = sanitizeResult(addon.name);
+        addonsArr.push(str);
+      });
+    }
 
     tvShowsArr = _.compact(_.uniq(tvShowsArr));
     moviesArr = _.compact(_.uniq(moviesArr));
+    movieGenresArr = _.compact(_.uniq(movieGenresArr));
     musiciansArr = _.compact(_.uniq(musiciansArr));
     albumsArr = _.compact(_.uniq(albumsArr));
+    songsArr = _.compact(_.uniq(songsArr));
     musicPlaylistsArr = _.compact(_.uniq(musicPlaylistsArr));
-    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'musicians': musiciansArr, 'albums': albumsArr, 'musicplaylists': musicPlaylistsArr});
+    videoPlaylistsArr = _.compact(_.uniq(videoPlaylistsArr));
+    addonsArr = _.compact(_.uniq(addonsArr));
+    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'songs': songsArr, 'musicplaylists': musicPlaylistsArr, 'videoplaylists': videoPlaylistsArr, 'addons': addonsArr});
   })).catch(function(err) {
     console.log(err);
-    
+
     if(err.response.status === 401)
       res.status(401).send('401: Not Authorized');
     else if(err.response.status === 404)

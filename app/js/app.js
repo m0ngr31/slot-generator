@@ -84,6 +84,15 @@ function submitForm() {
     });
     movieData.text(movieText);
 
+    var movieGenreData = $('#moviegenre-data');
+    var movieGenreText = '';
+    _.forEach(results.data.moviegenres, function(moviegenre, index, array) {
+      movieGenreText += moviegenre;
+      if(index !== array.length - 1)
+        movieGenreText += '\n';
+    });
+    movieGenreData.text(movieGenreText);
+
     var artistData = $('#musicartists-data');
     var artistText = '';
     _.forEach(results.data.musicians, function(artist, index, array) {
@@ -102,6 +111,15 @@ function submitForm() {
     });
     albumData.text(albumText);
 
+    var songData = $('#musicsongs-data');
+    var songText = '';
+    _.forEach(results.data.songs, function(song, index, array) {
+      songText += song;
+      if(index !== array.length - 1)
+        songText += '\n';
+    });
+    songData.text(songText);
+
     var musicplaylistsData = $('#musicplaylists-data');
     var musicplaylistsText = '';
     _.forEach(results.data.musicplaylists, function(playlist, index, array) {
@@ -110,6 +128,24 @@ function submitForm() {
         musicplaylistsText += '\n';
     });
     musicplaylistsData.text(musicplaylistsText);
+
+    var videoplaylistsData = $('#videoplaylists-data');
+    var videoplaylistsText = '';
+    _.forEach(results.data.videoplaylists, function(playlist, index, array) {
+      videoplaylistsText += playlist;
+      if(index !== array.length - 1)
+        videoplaylistsText += '\n';
+    });
+    videoplaylistsData.text(videoplaylistsText);
+
+    var addonsData = $('#addons-data');
+    var addonsText = '';
+    _.forEach(results.data.addons, function(addon, index, array) {
+      addonsText += addon;
+      if(index !== array.length - 1)
+        addonsText += '\n';
+    });
+    addonsData.text(addonsText);
 
     dataRow.removeClass('hidden');
     clearProgress();
