@@ -67,11 +67,11 @@ app.post('/api/get-data', function (req, res) {
   };
 
   var promisesArr = [
-    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShows, timeout: 3000 }),
-    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovies, timeout: 3000 }),
-    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 3000 }),
-    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 3000 }),
-    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 3000 })
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShows, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovies, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 10000 })
   ];
 
   axios.all(promisesArr).then(axios.spread(function (shows, movies, musicians, albums, musicplaylists) {

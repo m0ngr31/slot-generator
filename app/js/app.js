@@ -56,7 +56,7 @@ function submitForm() {
   var promise = axios({
     method: 'post',
     url: '/api/get-data',
-    timeout: 5000,
+    timeout: 20000,
     data: {
       username: username,
       password: password,
