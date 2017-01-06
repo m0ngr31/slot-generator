@@ -15,8 +15,6 @@
     "bower": "^1.7.9",
     "compression": "^1.6.1",
     "express": "^4.13.4",
-    "lodash": "^4.11.0",
-    "normalize-strings": "^1.1.0",
-    "unorm": "^1.4.1"
+    "lodash": "^4.11.0"
   }
 }

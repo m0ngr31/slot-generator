@@ -3,8 +3,6 @@ var bodyParser = require('body-parser');
 var compress = require('compression');
 var axios = require('axios');
 var _ = require('lodash');
-var normalize = require('normalize-strings');
-var unorm = require('unorm');
 
 var app = express();
 var env = process.env.NODE_ENV || 'development';
@@ -86,22 +84,8 @@ app.post('/api/get-data', function (req, res) {
   var addonsArr = [];
 
   var sanitizeResult = function(str, removeBetween) {
-    var combining = /[\u0300-\u036F]/g;
-    str = unorm.nfkd(str).replace(combining, '');
-    str = normalize(str, {
-      "240": 'd',
-      "230": 'ae',
-      "193": 'a',
-      "246": 'o',
-      "250": 'u',
-      "243": 'o',
-      "235": 'e',
-      "233": 'e',
-      "225": 'a',
-      "237": 'i',
-      "193": 'A',
-      "253": 'y'
-    });
+    // Normalize string
+    str = _.deburr(str);
 
     if(removeBetween) {
       str = str.replace(/\([^)]*\)/, "");
@@ -118,7 +102,6 @@ app.post('/api/get-data', function (req, res) {
   };
 
   var promisesArr = [
-
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShows, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovies, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovieGenres, timeout: 10000 }),
