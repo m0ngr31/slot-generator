@@ -85,7 +85,7 @@ app.post('/api/get-data', function (req, res) {
   var videoPlaylistsArr = [];
   var addonsArr = [];
 
-  var sanitizeResult = function(str) {
+  var sanitizeResult = function(str, removeBetween) {
     var combining = /[\u0300-\u036F]/g;
     str = unorm.nfkd(str).replace(combining, '');
     str = normalize(str, {
@@ -103,10 +103,15 @@ app.post('/api/get-data', function (req, res) {
       "253": 'y'
     });
 
-    // str = normalizeForSearch(str);
-
-    str = str.replace(/\([^)]*\)/, "");
-    str = str.replace(/\[[^)]*\]/, "");
+    if(removeBetween) {
+      str = str.replace(/\([^)]*\)/, "");
+      str = str.replace(/\[[^)]*\]/, "");
+    } else {
+      str = str.replace(/\(/, "");
+      str = str.replace(/\)/, "");
+      str = str.replace(/\[/, "");
+      str = str.replace(/\]/, "");
+    }
 
     str = _.trim(str);
     return str;
@@ -132,73 +137,97 @@ app.post('/api/get-data', function (req, res) {
     if(shows.data.result && shows.data.result.tvshows) {
       _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
+        var str_stripped = sanitizeResult(tvshow.label, true);
         tvShowsArr.push(str);
+        tvShowsArr.push(str_stripped);
       });
     }
     if(movies.data.result && movies.data.result.movies) {
       _.forEach(movies.data.result.movies, function(movie) {
         var str = sanitizeResult(movie.label);
+        var str_stripped = sanitizeResult(movie.label, true);
         moviesArr.push(str);
+        moviesArr.push(str_stripped);
       });
     }
     if(moviegenres.data.result && moviegenres.data.result.genres) {
       _.forEach(moviegenres.data.result.genres, function(genre) {
         var str = sanitizeResult(genre.label);
+        var str_stripped = sanitizeResult(genre.label, true);
         movieGenresArr.push(str);
+        movieGenresArr.push(str_stripped);
       });
     }
     if(musicians.data.result && musicians.data.result.artists) {
       _.forEach(musicians.data.result.artists, function(artist) {
         var str = sanitizeResult(artist.label);
+        var str_stripped = sanitizeResult(artist.label, true);
         musiciansArr.push(str);
+        musiciansArr.push(str_stripped);
       });
     }
     if(albums.data.result && albums.data.result.albums) {
       _.forEach(albums.data.result.albums, function(album) {
         var str = sanitizeResult(album.label);
+        var str_stripped = sanitizeResult(album.label, true);
         albumsArr.push(str);
+        albumsArr.push(str_stripped);
       });
     }
     if(songs.data.result && songs.data.result.songs) {
       _.forEach(songs.data.result.songs, function(song) {
         var str = sanitizeResult(song.label);
+        var str_stripped = sanitizeResult(song.label, true);
         songsArr.push(str);
+        songsArr.push(str_stripped);
       });
     }
     if(musicplaylists.data.result && musicplaylists.data.result.files) {
       _.forEach(musicplaylists.data.result.files, function(playlist) {
         var str = sanitizeResult(playlist.label);
+        var str_stripped = sanitizeResult(playlist.label, true);
         musicPlaylistsArr.push(str);
+        musicPlaylistsArr.push(str_stripped);
       });
     }
     if(videoplaylists.data.result && videoplaylists.data.result.files) {
       _.forEach(videoplaylists.data.result.files, function(playlist) {
         var str = sanitizeResult(playlist.label);
+        var str_stripped = sanitizeResult(playlist.label, true);
         videoPlaylistsArr.push(str);
+        videoPlaylistsArr.push(str_stripped);
       });
     }
     if(addonsvideo.data.result && addonsvideo.data.result.addons) {
       _.forEach(addonsvideo.data.result.addons, function(addon) {
         var str = sanitizeResult(addon.name);
+        var str_stripped = sanitizeResult(addon.name, true);
         addonsArr.push(str);
+        addonsArr.push(str_stripped);
       });
     }
     if(addonsaudio.data.result && addonsaudio.data.result.addons) {
       _.forEach(addonsaudio.data.result.addons, function(addon) {
         var str = sanitizeResult(addon.name);
+        var str_stripped = sanitizeResult(addon.name, true);
         addonsArr.push(str);
+        addonsArr.push(str_stripped);
       });
     }
     if(addonsimage.data.result && addonsimage.data.result.addons) {
       _.forEach(addonsimage.data.result.addons, function(addon) {
         var str = sanitizeResult(addon.name);
+        var str_stripped = sanitizeResult(addon.name, true);
         addonsArr.push(str);
+        addonsArr.push(str_stripped);
       });
     }
     if(addonsexe.data.result && addonsexe.data.result.addons) {
       _.forEach(addonsexe.data.result.addons, function(addon) {
         var str = sanitizeResult(addon.name);
+        var str_stripped = sanitizeResult(addon.name, true);
         addonsArr.push(str);
+        addonsArr.push(str_stripped);
       });
     }
 
