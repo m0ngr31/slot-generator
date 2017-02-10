@@ -97,6 +97,12 @@ app.post('/api/get-data', function (req, res) {
       str = str.replace(/\]/, "");
     }
 
+    // Keep character limit from hitting 140
+    if(str.length > 140) {
+      str = str.substring(0, 141); 
+      str = str.substring(0, Math.min(str.length, str.lastIndexOf(" ")));
+    }
+
     str = _.trim(str);
     return str;
   };
