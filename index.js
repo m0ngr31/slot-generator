@@ -85,7 +85,7 @@ app.post('/api/get-data', function (req, res) {
 
   var sanitizeResult = function(str, removeBetween) {
     // Normalize string
-    str = _.deburr(str);
+    // str = _.deburr(str);
 
     if(removeBetween) {
       str = str.replace(/\([^)]*\)/, "");
