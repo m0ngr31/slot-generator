@@ -97,7 +97,7 @@ app.post('/api/get-data', function (req, res) {
       str = str.replace(/\]/, "");
     }
 
-    str = str.replace('"', '');
+    str = str.replace(/[`~!#$%^*()_=+\[\]{}\\|;:"<>\/?]/, '');
 
     // Keep character limit from hitting 140
     if(str.length > 140) {
