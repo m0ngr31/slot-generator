@@ -83,25 +83,18 @@ app.post('/api/get-data', function (req, res) {
   var videoPlaylistsArr = [];
   var addonsArr = [];
 
-  var sanitizeResult = function(str, removeBetween) {
+  var sanitizeResult = function(str) {
     // Normalize string
     // str = _.deburr(str);
 
-    if(removeBetween) {
-      str = str.replace(/\([^)]*\)/, "");
-      str = str.replace(/\[[^)]*\]/, "");
-    } else {
-      str = str.replace(/\(/, "");
-      str = str.replace(/\)/, "");
-      str = str.replace(/\[/, "");
-      str = str.replace(/\]/, "");
-    }
-
+    // Remove invalid characters, per Amazon:
+    // Slot type values can contain alphanumeric characters, spaces, commas,
+    // apostrophes, periods, hyphens, ampersands and the @ symbol only.
     str = str.replace(/[`~!#$%^*()_=+\[\]{}\\|;:"<>\/?]/, '');
 
-    // Keep character limit from hitting 140
+    // Slot items cannot exceed 140 chars, per Amazon
     if(str.length > 140) {
-      str = str.substring(0, 141); 
+      str = str.substring(0, 141);
       str = str.substring(0, Math.min(str.length, str.lastIndexOf(" ")));
     }
 
