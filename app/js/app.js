@@ -12,6 +12,15 @@ function validateUrl(str) {
   return str.length < 2083 && url.test(str);
 }
 
+function checkHttps() {
+  $('#kodi-address').removeClass();
+
+  if($('#https-check').is(':checked'))
+    $('#kodi-address').addClass('url-before-https');
+  else
+    $('#kodi-address').addClass('url-before');
+}
+
 function submitForm() {
   var errorRow = $('#error-row');
   var errorMsg = $('#error-text');
@@ -61,7 +70,8 @@ function submitForm() {
       username: username,
       password: password,
       address: url,
-      port: port
+      port: port,
+      protocol: $('#https-check').is(':checked') ? 'https://' : 'http://'
     }
   });
 

@@ -26,7 +26,7 @@ app.use(express.static(__dirname + '/app'));
 app.post('/api/get-data', function (req, res) {
   var serverInfo = req.body;
   serverInfo.address = _.trimEnd(serverInfo.address, '/');
-  var url = 'http://' + serverInfo.address + ':' + serverInfo.port + '/jsonrpc';
+  var url = serverInfo.protocol + serverInfo.address + ':' + serverInfo.port + '/jsonrpc';
 
   var mainOptions = {
     "jsonrpc":"2.0",
@@ -90,7 +90,7 @@ app.post('/api/get-data', function (req, res) {
     // Remove invalid characters, per Amazon:
     // Slot type values can contain alphanumeric characters, spaces, commas,
     // apostrophes, periods, hyphens, ampersands and the @ symbol only.
-    str = str.replace(/[`~!#$%^*()_=+\[\]{}\\|;:"<>\/?]/, '');
+    str = str.replace(/[`~!#$%^*()_=+\[\]{}\\|;:"<>/?]/g, ' ');
 
     // Slot items cannot exceed 140 chars, per Amazon
     if(str.length > 140) {

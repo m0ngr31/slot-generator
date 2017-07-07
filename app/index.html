@@ -29,7 +29,7 @@
         <div class="row" id="form">
           <div class="nine columns">
             <label for="url">Kodi Address (URL or IP address)</label>
-            <span class="url-before"><input class="u-full-width" type="text" placeholder="kodi.mydomain.com" id="url"></span>
+            <span class="url-before" id="kodi-address"><input class="u-full-width" type="text" placeholder="kodi.mydomain.com" id="url"></span>
           </div>
           <div class="three columns">
             <label for="portnumber">Port</label>
@@ -46,7 +46,17 @@
             <input class="u-full-width" type="password" placeholder="kodi" id="password">
           </div>
         </div>
-        <input class="button-primary" type="submit" id="submit-button" value="Submit" />
+        <div class="row">
+          <div class="six columns">
+            <input class="button-primary" type="submit" id="submit-button" value="Submit" />
+          </div>
+          <div class="six columns">
+            <label class="example-send-yourself-copy">
+              <input type="checkbox" id="https-check" onclick="checkHttps()">
+              <span class="label-body">Use HTTPS?</span>
+            </label>
+          </div>
+        </div>
       </form>
       <div class="hidden" id="show-data">
         <div class="row">

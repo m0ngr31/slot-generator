@@ -13,6 +13,21 @@
   padding-top: 7px;
 }
 
+.url-before-https {
+  position: relative;
+}
+
+.url-before-https input {
+  padding-left:60px;
+}
+
+.url-before-https:before {
+  position: absolute;
+  content:"https://";
+  padding-left: 8px;
+  padding-top: 7px;
+}
+
 .error {
   color: red;
   margin-bottom: 10px;
