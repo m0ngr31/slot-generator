@@ -130,6 +130,15 @@ function submitForm() {
     });
     songData.text(songText);
 
+    var musicGenreData = $('#musicgenres-data');
+    var musicGenreText = '';
+    _.forEach(results.data.musicgenres, function(musicgenre, index, array) {
+      musicGenreText += musicgenre;
+      if(index !== array.length - 1)
+        musicGenreText += '\n';
+    });
+    musicGenreData.text(musicGenreText);
+
     var musicplaylistsData = $('#musicplaylists-data');
     var musicplaylistsText = '';
     _.forEach(results.data.musicplaylists, function(playlist, index, array) {

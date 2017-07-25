@@ -60,6 +60,8 @@ app.post('/api/get-data', function (req, res) {
   getAlbums.method = "AudioLibrary.GetAlbums";
   var getSongs = _.clone(mainOptions);
   getSongs.method = "AudioLibrary.GetSongs";
+  var getMusicGenres = _.clone(mainOptions);
+  getMusicGenres.method = "AudioLibrary.GetGenres";
   var getMusicPlaylists = _.clone(musicPlaylistOptions);
   getMusicPlaylists.method = "Files.GetDirectory";
   var getVideoPlaylists = _.clone(videoPlaylistOptions);
@@ -79,6 +81,7 @@ app.post('/api/get-data', function (req, res) {
   var musiciansArr = [];
   var albumsArr = [];
   var songsArr = [];
+  var musicGenresArr = [];
   var musicPlaylistsArr = [];
   var videoPlaylistsArr = [];
   var addonsArr = [];
@@ -109,6 +112,7 @@ app.post('/api/get-data', function (req, res) {
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getSongs, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicGenres, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicPlaylists, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getVideoPlaylists, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsVideo, timeout: 10000 }),
@@ -117,7 +121,7 @@ app.post('/api/get-data', function (req, res) {
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsExe, timeout: 10000 })
   ];
 
-  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, songs, musicplaylists, videoplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
+  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, songs, musicgenres, musicplaylists, videoplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
     if(shows.data.result && shows.data.result.tvshows) {
       _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
@@ -164,6 +168,14 @@ app.post('/api/get-data', function (req, res) {
         var str_stripped = sanitizeResult(song.label, true);
         songsArr.push(str);
         songsArr.push(str_stripped);
+      });
+    }
+    if(musicgenres.data.result && musicgenres.data.result.genres) {
+      _.forEach(musicgenres.data.result.genres, function(genre) {
+        var str = sanitizeResult(genre.label);
+        var str_stripped = sanitizeResult(genre.label, true);
+        musicGenresArr.push(str);
+        musicGenresArr.push(str_stripped);
       });
     }
     if(musicplaylists.data.result && musicplaylists.data.result.files) {
@@ -221,10 +233,11 @@ app.post('/api/get-data', function (req, res) {
     musiciansArr = _.take(_.shuffle(_.compact(_.uniq(musiciansArr))), 100);
     albumsArr = _.take(_.shuffle(_.compact(_.uniq(albumsArr))), 100);
     songsArr = _.take(_.shuffle(_.compact(_.uniq(songsArr))), 100);
+    musicGenresArr = _.take(_.shuffle(_.compact(_.uniq(musicGenresArr))), 100);
     musicPlaylistsArr = _.take(_.shuffle(_.compact(_.uniq(musicPlaylistsArr))), 100);
     videoPlaylistsArr = _.take(_.shuffle(_.compact(_.uniq(videoPlaylistsArr))), 100);
     addonsArr = _.take(_.shuffle(_.compact(_.uniq(addonsArr))), 100);
-    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'songs': songsArr, 'musicplaylists': musicPlaylistsArr, 'videoplaylists': videoPlaylistsArr, 'addons': addonsArr});
+    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'songs': songsArr, 'musicgenres': musicGenresArr, 'musicplaylists': musicPlaylistsArr, 'videoplaylists': videoPlaylistsArr, 'addons': addonsArr});
   })).catch(function(err) {
     console.log(err);
 
