@@ -49,11 +49,17 @@ app.post('/api/get-data', function (req, res) {
 
   var getTVShows = _.clone(mainOptions);
   getTVShows.method = "VideoLibrary.GetTVShows";
+  var getTVShowGenres = _.clone(mainOptions);
+  getTVShowGenres.method = "VideoLibrary.GetGenres";
+  getTVShowGenres.params = {"type":"tvshow"};
   var getMovies = _.clone(mainOptions);
   getMovies.method = "VideoLibrary.GetMovies";
   var getMovieGenres = _.clone(mainOptions);
   getMovieGenres.method = "VideoLibrary.GetGenres";
   getMovieGenres.params = {"type":"movie"};
+  var getMusicVideoGenres = _.clone(mainOptions);
+  getMusicVideoGenres.method = "VideoLibrary.GetGenres";
+  getMusicVideoGenres.params = {"type":"musicvideo"};
   var getMusicians = _.clone(mainOptions);
   getMusicians.method = "AudioLibrary.GetArtists";
   var getAlbums = _.clone(mainOptions);
@@ -76,8 +82,10 @@ app.post('/api/get-data', function (req, res) {
   getAddonsExe.method = "Addons.GetAddons";
 
   var tvShowsArr = [];
+  var tvGenresArr = [];
   var moviesArr = [];
   var movieGenresArr = [];
+  var musicvideoGenresArr = [];
   var musiciansArr = [];
   var albumsArr = [];
   var songsArr = [];
@@ -107,8 +115,10 @@ app.post('/api/get-data', function (req, res) {
 
   var promisesArr = [
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShows, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getTVShowGenres, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovies, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMovieGenres, timeout: 10000 }),
+    axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicVideoGenres, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getMusicians, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAlbums, timeout: 10000 }),
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getSongs, timeout: 10000 }),
@@ -121,13 +131,21 @@ app.post('/api/get-data', function (req, res) {
     axios({ method: 'post', url: url, auth: {username: serverInfo.username, password: serverInfo.password}, data: getAddonsExe, timeout: 10000 })
   ];
 
-  axios.all(promisesArr).then(axios.spread(function (shows, movies, moviegenres, musicians, albums, songs, musicgenres, musicplaylists, videoplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
+  axios.all(promisesArr).then(axios.spread(function (shows, showgenres, movies, moviegenres, musicvideogenres, musicians, albums, songs, musicgenres, musicplaylists, videoplaylists, addonsvideo, addonsaudio, addonsimage, addonsexe) {
     if(shows.data.result && shows.data.result.tvshows) {
       _.forEach(shows.data.result.tvshows, function(tvshow) {
         var str = sanitizeResult(tvshow.label);
         var str_stripped = sanitizeResult(tvshow.label, true);
         tvShowsArr.push(str);
         tvShowsArr.push(str_stripped);
+      });
+    }
+    if(showgenres.data.result && showgenres.data.result.genres) {
+      _.forEach(showgenres.data.result.genres, function(genre) {
+        var str = sanitizeResult(genre.label);
+        var str_stripped = sanitizeResult(genre.label, true);
+        tvGenresArr.push(str);
+        tvGenresArr.push(str_stripped);
       });
     }
     if(movies.data.result && movies.data.result.movies) {
@@ -144,6 +162,14 @@ app.post('/api/get-data', function (req, res) {
         var str_stripped = sanitizeResult(genre.label, true);
         movieGenresArr.push(str);
         movieGenresArr.push(str_stripped);
+      });
+    }
+    if(musicvideogenres.data.result && musicvideogenres.data.result.genres) {
+      _.forEach(musicvideogenres.data.result.genres, function(genre) {
+        var str = sanitizeResult(genre.label);
+        var str_stripped = sanitizeResult(genre.label, true);
+        musicvideoGenresArr.push(str);
+        musicvideoGenresArr.push(str_stripped);
       });
     }
     if(musicians.data.result && musicians.data.result.artists) {
@@ -228,8 +254,10 @@ app.post('/api/get-data', function (req, res) {
     }
 
     tvShowsArr = _.take(_.shuffle(_.compact(_.uniq(tvShowsArr))), 100);
+    tvGenresArr = _.take(_.shuffle(_.compact(_.uniq(tvGenresArr))), 100);
     moviesArr = _.take(_.shuffle(_.compact(_.uniq(moviesArr))), 100);
     movieGenresArr = _.take(_.shuffle(_.compact(_.uniq(movieGenresArr))), 100);
+    musicvideoGenresArr = _.take(_.shuffle(_.compact(_.uniq(musicvideoGenresArr))), 100);
     musiciansArr = _.take(_.shuffle(_.compact(_.uniq(musiciansArr))), 100);
     albumsArr = _.take(_.shuffle(_.compact(_.uniq(albumsArr))), 100);
     songsArr = _.take(_.shuffle(_.compact(_.uniq(songsArr))), 100);
@@ -237,7 +265,7 @@ app.post('/api/get-data', function (req, res) {
     musicPlaylistsArr = _.take(_.shuffle(_.compact(_.uniq(musicPlaylistsArr))), 100);
     videoPlaylistsArr = _.take(_.shuffle(_.compact(_.uniq(videoPlaylistsArr))), 100);
     addonsArr = _.take(_.shuffle(_.compact(_.uniq(addonsArr))), 100);
-    res.send({'tvshows': tvShowsArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'songs': songsArr, 'musicgenres': musicGenresArr, 'musicplaylists': musicPlaylistsArr, 'videoplaylists': videoPlaylistsArr, 'addons': addonsArr});
+    res.send({'tvshows': tvShowsArr, 'tvshowgenres': tvGenresArr, 'movies': moviesArr, 'moviegenres': movieGenresArr, 'musicvideogenres': musicvideoGenresArr, 'musicians': musiciansArr, 'albums': albumsArr, 'songs': songsArr, 'musicgenres': musicGenresArr, 'musicplaylists': musicPlaylistsArr, 'videoplaylists': videoPlaylistsArr, 'addons': addonsArr});
   })).catch(function(err) {
     console.log(err);
 

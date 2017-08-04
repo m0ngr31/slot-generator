@@ -85,6 +85,15 @@ function submitForm() {
     });
     tvData.text(tvText);
 
+    var tvGenreData = $('#tvshowgenre-data');
+    var tvGenreText = '';
+    _.forEach(results.data.tvshowgenres, function(tvshowgenre, index, array) {
+      tvGenreText += tvshowgenre;
+      if(index !== array.length - 1)
+        tvGenreText += '\n';
+    });
+    tvGenreData.text(tvGenreText);
+
     var movieData = $('#movie-data');
     var movieText = '';
     _.forEach(results.data.movies, function(movie, index, array) {
@@ -102,6 +111,15 @@ function submitForm() {
         movieGenreText += '\n';
     });
     movieGenreData.text(movieGenreText);
+
+    var musicvideoGenreData = $('#musicvideogenre-data');
+    var musicvideoGenreText = '';
+    _.forEach(results.data.musicvideogenres, function(musicvideogenre, index, array) {
+      musicvideoGenreText += musicvideogenre;
+      if(index !== array.length - 1)
+        musicvideoGenreText += '\n';
+    });
+    musicvideoGenreData.text(musicvideoGenreText);
 
     var artistData = $('#musicartists-data');
     var artistText = '';
