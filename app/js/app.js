@@ -112,6 +112,15 @@ function submitForm() {
     });
     movieGenreData.text(movieGenreText);
 
+    var musicvideoData = $('#musicvideo-data');
+    var musicvideoText = '';
+    _.forEach(results.data.musicvideos, function(musicvideo, index, array) {
+      musicvideoText += musicvideo;
+      if(index !== array.length - 1)
+        musicvideoText += '\n';
+    });
+    musicvideoData.text(musicvideoText);
+
     var musicvideoGenreData = $('#musicvideogenre-data');
     var musicvideoGenreText = '';
     _.forEach(results.data.musicvideogenres, function(musicvideogenre, index, array) {
